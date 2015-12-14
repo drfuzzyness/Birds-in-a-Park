@@ -162,6 +162,12 @@ public class PlayerController : MonoBehaviour {
 		
 		yield return new WaitForSeconds(1f);
 		gtastars.gameObject.SetActive(true);
+		
+		yield return new WaitForSeconds(1f);
+		gtastars.gameObject.SetActive(false);
+		
+		yield return new WaitForSeconds(1f);
+		gtastars.gameObject.SetActive(true);
 		// show gun
 		
 		crosshair.SetActive(true);
@@ -212,25 +218,25 @@ public class PlayerController : MonoBehaviour {
 	IEnumerator MoveGunUp() {
 		gunSound.Play();
 		gun.SetActive( true );
-		Vector3 originalPosition = gun.transform.position;
-		gun.transform.Translate( 0, -.4f, 0 );
-		Vector3 loweredPosition = gun.transform.position;
+		Vector3 originalPosition = gun.transform.localPosition;
+		gun.transform.Translate( 0, -.4f, 0, Space.Self );
+		Vector3 loweredPosition = gun.transform.localPosition;
 		for( float time = 0; time < 2f; time += Time.deltaTime ) {
-			gun.transform.position = Vector3.Lerp( loweredPosition, originalPosition, time/ 2f );
+			gun.transform.localPosition = Vector3.Lerp( loweredPosition, originalPosition, time/ 2f );
 			yield return null;
 		}
-		gun.transform.position = originalPosition;	
+		gun.transform.localPosition = originalPosition;	
 	}
 	
 	IEnumerator MoveGunDown() {
 		gunSound.Play();
-		Vector3 originalPosition = gun.transform.position;
-		Vector3 loweredPosition = gun.transform.position - new Vector3(0, .4f, 0);
+		Vector3 originalPosition = gun.transform.localPosition;
+		Vector3 loweredPosition = gun.transform.localPosition - new Vector3(0, .4f, 0);
 		for( float time = 0; time < 2f; time += Time.deltaTime ) {
-			gun.transform.position = Vector3.Lerp( originalPosition, loweredPosition, time/ 2f );
+			gun.transform.localPosition = Vector3.Lerp( originalPosition, loweredPosition, time/ 2f );
 			yield return null;
 		}
-		gun.transform.position = loweredPosition;
+		gun.transform.localPosition = loweredPosition;
 		gun.SetActive(false);
 		gunEnabled = false;	
 	}
@@ -248,6 +254,7 @@ public class PlayerController : MonoBehaviour {
 		
 		yield return new WaitForSeconds(2);
 		introText.gameObject.SetActive(true);
+		Cardboard.SDK.Recenter();
 		introText.text = "Oh.";
 		yield return new WaitForSeconds(4);
 		introText.text = "Well then.";
