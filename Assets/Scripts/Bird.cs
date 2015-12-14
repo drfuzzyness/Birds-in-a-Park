@@ -4,6 +4,7 @@ using System.Collections;
 public class Bird : MonoBehaviour {
 	public float age;
 	public AnimationCurve animation;
+	public Renderer mesh;
 	private AudioSource cooing;
 	// Use this for initialization
 	void Start () {

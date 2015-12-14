@@ -7,6 +7,7 @@ public class BirdManager : MonoBehaviour {
 	public BirdManager instance;
 	public AnimationCurve birdFlyAnimation;
 	public List<string> birdPhrases;
+	public List<Color> birdColors;
 	public GameObject birdPrefab;
 	public Vector3 birdSpawnOffset;
 	
@@ -29,6 +30,7 @@ public class BirdManager : MonoBehaviour {
 	public void MakeBird( Vector3 position) {
 		Bird newbird = ((GameObject) Instantiate( birdPrefab.gameObject, position + birdSpawnOffset, Quaternion.identity )).GetComponent<Bird>();
 		birds.Add( newbird );
+		newbird.mesh.material.color = birdColors[ Random.Range(0, birdColors.Count)];
 		newbird.GoFlyTo( position, Quaternion.identity, 2 );
 	}
 	

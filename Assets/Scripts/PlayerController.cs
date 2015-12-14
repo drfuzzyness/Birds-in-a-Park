@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,6 +12,7 @@ public class PlayerController : MonoBehaviour {
 	public AnimationCurve lightFlashCurve;
 	public Text introText;
 	public GameObject titleCard;
+	public AudioMixer audioMixer;
 	
 	public GameObject breadcrumbPrefab;
 	public Vector3 crumbForce;
@@ -26,7 +28,7 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Cardboard.SDK.Recenter();
-		crumbsDisabled = true;
+		crumbsDisabled = false;
 		gunEnabled = false;
 		originalLightIntensities = new List<float>();
 		
@@ -34,7 +36,7 @@ public class PlayerController : MonoBehaviour {
 		Cardboard.SDK.OnTrigger += OnTrigger;
 		gun.SetActive(false);
 		crosshair.SetActive(false);
-		StartCoroutine( OpeningSequence() );
+		// StartCoroutine( OpeningSequence() );
 	}
 	
 	void OnTrigger() {
@@ -57,13 +59,15 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	IEnumerator OpeningSequence() {
-		
+		crumbsDisabled = true;
+		gunEnabled = false;
 		foreach( Light thisLight in playerLights ) {
 			originalLightIntensities.Add(thisLight.intensity);
 			thisLight.intensity = 0;
 		}
-		introText.gameObject.SetActive(true);
+		introText.gameObject.SetActive(false);
 		yield return new WaitForSeconds(2.8f); // 2.8
+		introText.gameObject.SetActive(true);
 		introText.text = "Ladies, gentlemen, and everyone.";
 		yield return new WaitForSeconds(5.32f); // 8.12
 		introText.text = "Tonight. For your audiovisual and interactive experience.";
@@ -83,7 +87,7 @@ public class PlayerController : MonoBehaviour {
 			yield return new WaitForSeconds( 1.5f );
 		}
 		crumbsDisabled = false;
-		
+		audioMixer.SetFloat("AudienceVolume", .8f);
 	}
 	
 	IEnumerator EnableLight(int index) {
@@ -103,6 +107,7 @@ public class PlayerController : MonoBehaviour {
 	
 	IEnumerator ThrowCrumb() {
 		crumbsDisabled = true;
+		noteriety++;
 		GameObject crumb = (GameObject) Instantiate( breadcrumbPrefab, transform.position, Cardboard.SDK.HeadPose.Orientation );
 		yield return null;
 		// Debug.Log(  );
@@ -113,6 +118,8 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	IEnumerator TakeOutGun() {
+		audioMixer.SetFloat("PigeonsVolume", .2f);
+		audioMixer.SetFloat("AudienceVolume", .2f);
 		// stop music
 		// quiet birds
 		// show stars

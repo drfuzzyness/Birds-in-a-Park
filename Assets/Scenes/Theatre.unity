@@ -14561,6 +14561,7 @@ MonoBehaviour:
     m_RotationOrder: 0
   introText: {fileID: 2146571436}
   titleCard: {fileID: 330972845}
+  audioMixer: {fileID: 24100000, guid: 9cfc5fbd97c61479fa7799034981ef42, type: 2}
   breadcrumbPrefab: {fileID: 186164, guid: 8e5a4d13459b4414eb6b3fffb60ad39a, type: 2}
   crumbForce: {x: -3, y: 3, z: 0}
   birdManager: {fileID: 1944835826}
@@ -38347,6 +38348,11 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 0
   birdPhrases: []
+  birdColors:
+  - {r: 0.5686275, g: 0.43137255, b: 0.27450982, a: 1}
+  - {r: 0.96862745, g: 0.29803923, b: 0, a: 1}
+  - {r: 0.972549, g: 0.77254903, b: 0, a: 1}
+  - {r: 0.11372549, g: 0.34117648, b: 0.7529412, a: 1}
   birdPrefab: {fileID: 145846, guid: 5768b561b1ba14303891c0f5d53fba14, type: 2}
   birdSpawnOffset: {x: 3, y: 5, z: -0.5}
 --- !u!4 &1944835827
