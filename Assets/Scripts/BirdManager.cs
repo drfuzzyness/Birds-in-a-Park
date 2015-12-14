@@ -8,6 +8,7 @@ public class BirdManager : MonoBehaviour {
 	public List<string> birdPhrases;
 	public GameObject birdPrefab;
 	public Vector3 birdSpawnOffset;
+	
 	private List<Bird> birds;
 
 	// Use this for initialization
@@ -17,7 +18,6 @@ public class BirdManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
 	}
 	
 	public void MakeBird( Vector3 position) {
