@@ -1,7 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour {
+	
+	public GameObject gun;
+	public GameObject crosshair;
+	public List<Light> playerLights;
+	public Light audienceLight;
 	
 	public GameObject breadcrumbPrefab;
 	public Vector3 crumbForce;
@@ -10,24 +16,29 @@ public class PlayerController : MonoBehaviour {
 	public int keyNoteriety;
 	private Event CardboardOnTrigger;
 	private float tapDuration;
-	private bool throwingCrumb;
+	private bool crumbsDisabled;
+	private bool gunEnabled;
 
 	// Use this for initialization
 	void Start () {
 		Cardboard.SDK.Recenter();
-		throwingCrumb = false;
-		iTween.CameraFadeAdd();
-		iTween.CameraFadeTo(0, 2);
+		crumbsDisabled = true;
+		gunEnabled = false;
+		
 		Cardboard.SDK.TapIsTrigger = true;
 		Cardboard.SDK.OnTrigger += OnTrigger;
+		gun.SetActive(false);
+		crosshair.SetActive(false);
+		StartCoroutine( OpeningSequence() );
 	}
 	
 	void OnTrigger() {
 		tapDuration += 1;
-		if( tapDuration >= 3 ) {
+		if( tapDuration > 1 ) {
 			Cardboard.SDK.Recenter();
+			Debug.Log("resetting camera");
 			tapDuration = 0;
-		} else if( !throwingCrumb ) {
+		} else if( !crumbsDisabled ) {
 			StartCoroutine( ThrowCrumb() );
 		}
 	}
@@ -40,15 +51,23 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 	
+	IEnumerator OpeningSequence() {
+		audienceLight.intensity = 0;
+		foreach( Light thisLight in playerLights ) {
+			thisLight.intensity = 0;
+		}
+		yield return null;
+	}
+	
 	IEnumerator ThrowCrumb() {
-		throwingCrumb = true;
+		crumbsDisabled = true;
 		GameObject crumb = (GameObject) Instantiate( breadcrumbPrefab, transform.position, Cardboard.SDK.HeadPose.Orientation );
 		yield return null;
 		// Debug.Log(  );
 		crumb.GetComponent<Rigidbody>().AddRelativeForce( crumbForce, ForceMode.VelocityChange );
 		yield return new WaitForSeconds(2);
 		birdManager.MakeBird( crumb.transform.position );
-		throwingCrumb = false;
+		crumbsDisabled = false;
 	}
 	
 	IEnumerator TakeOutGun() {
@@ -57,6 +76,8 @@ public class PlayerController : MonoBehaviour {
 		// show stars
 		yield return new WaitForSeconds(2);
 		// show gun
+		gun.SetActive(true);
+		crosshair.SetActive(true);
 		// wait for seconds and check if looking at audience
 		
 	}
