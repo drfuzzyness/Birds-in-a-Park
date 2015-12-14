@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
 	public BirdManager birdManager;
 	public int noteriety;
 	public int keyNoteriety;
+	private Event CardboardOnTrigger;
 	private float tapDuration;
 	private bool throwingCrumb;
 
@@ -17,40 +18,42 @@ public class PlayerController : MonoBehaviour {
 		throwingCrumb = false;
 		iTween.CameraFadeAdd();
 		iTween.CameraFadeTo(0, 2);
+		Cardboard.SDK.TapIsTrigger = true;
+		Cardboard.SDK.OnTrigger += OnTrigger;
+	}
+	
+	void OnTrigger() {
+		tapDuration += 1;
+		if( tapDuration >= 3 ) {
+			Cardboard.SDK.Recenter();
+			tapDuration = 0;
+		} else if( !throwingCrumb ) {
+			StartCoroutine( ThrowCrumb() );
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if( Input.anyKey ) {
-			tapDuration += Time.deltaTime;
-		} else {
-			if( tapDuration > 2f ) {
-				Cardboard.SDK.Recenter();
-			} else if( tapDuration > .1f ) {
-				// throw crumb
-				if( !throwingCrumb ) {
-					noteriety++;
-					StartCoroutine( ThrowCrumb() );
-				}
-			}
-			tapDuration = 0;
-		}
-		
+		tapDuration -= Time.deltaTime;
 		if( noteriety > keyNoteriety ) {
-			
+			StartCoroutine( TakeOutGun() );
 		}
 	}
 	
 	IEnumerator ThrowCrumb() {
 		throwingCrumb = true;
-		GameObject crumb = (GameObject) Instantiate( breadcrumbPrefab, transform.position, Quaternion.identity );
-		crumb.GetComponent<Rigidbody>().AddForce( crumbForce, ForceMode.VelocityChange );
+		GameObject crumb = (GameObject) Instantiate( breadcrumbPrefab, transform.position, Cardboard.SDK.HeadPose.Orientation );
+		yield return null;
+		// Debug.Log(  );
+		crumb.GetComponent<Rigidbody>().AddRelativeForce( crumbForce, ForceMode.VelocityChange );
 		yield return new WaitForSeconds(2);
 		birdManager.MakeBird( crumb.transform.position );
 		throwingCrumb = false;
 	}
 	
 	IEnumerator TakeOutGun() {
+		// stop music
+		// quiet birds
 		// show stars
 		yield return new WaitForSeconds(2);
 		// show gun
