@@ -37,6 +37,7 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Cardboard.SDK.Recenter();
+		Cardboard.SDK.BackButtonMode = Cardboard.BackButtonModes.Off;
 		crumbsDisabled = false;
 		gunEnabled = false;
 		shotGun = false;
@@ -91,7 +92,7 @@ public class PlayerController : MonoBehaviour {
 		introText.gameObject.SetActive(true);
 		introText.text = "Ladies, gentlemen, and everyone.";
 		yield return new WaitForSeconds(5.32f); // 8.12
-		introText.text = "Tonight. For your audiovisual and interactive experience.";
+		introText.text = "Tonight. For your audiovisual and interactive entertainment.";
 		yield return new WaitForSeconds(6.98f); // 15.1
 		introText.text = "A slow and reserved experience.";
 		yield return new WaitForSeconds(6.3f); // 21.4
@@ -99,7 +100,7 @@ public class PlayerController : MonoBehaviour {
 		titleCard.SetActive(true);
 		yield return new WaitForSeconds(8.1f); // 29.5
 		introText.gameObject.SetActive(true);
-		introText.text = "Press button to feed birds";
+		introText.text = "Once we begin, press button to feed birds.";
 		yield return new WaitForSeconds(6.5f);
 		introText.gameObject.SetActive(false);
 		titleCard.SetActive(false);
@@ -108,8 +109,8 @@ public class PlayerController : MonoBehaviour {
 			yield return new WaitForSeconds( 1.5f );
 		}
 		crumbsDisabled = false;
-		audioMixer.SetFloat("AudienceVolume", 0);
-		audioMixer.SetFloat("ForestVolume", 0);
+		StartCoroutine( ScaleAudio("AudienceVolume", 0, 4) );
+		StartCoroutine( ScaleAudio("ForestVolume", 0, 10) );
 		audioMixer.SetFloat("PigeonsVolume", -20);
 	}
 	
@@ -142,9 +143,9 @@ public class PlayerController : MonoBehaviour {
 	}
 	
 	IEnumerator TakeOutGun() {
-		audioMixer.SetFloat("PigeonsVolume", -70);
+		StartCoroutine( ScaleAudio("PigeonsVolume", -50, 12) );
 		// audioMixer.SetFloat("AudienceVolume", -70);
-		audioMixer.SetFloat("ForestVolume", -70);
+		StartCoroutine( ScaleAudio("ForestVolume", -50, 12) );
 		crumbsDisabled = true;
 		// stop music
 		// quiet birds
@@ -166,14 +167,13 @@ public class PlayerController : MonoBehaviour {
 		crosshair.SetActive(true);
 		gunEnabled = true;
 		
-		Debug.Log("1");
 		
 		// play gun sound
 		for( float timer = 0f; timer < gunTimer; timer += Time.deltaTime ){
 			if( shotGun ) {
 				StartCoroutine( ShotGunEnding() );
 				StopCoroutine( gunPhase );
-				Debug.Log("Shit1");
+
 			}
 			// Debug.Log("2");
 			yield return null;
@@ -182,6 +182,17 @@ public class PlayerController : MonoBehaviour {
 		// light backstage
 		// Debug.Log("3");
 		StartCoroutine( EnableLight(3) );
+		
+		for( float timer = 0f; timer < gunTimer; timer += Time.deltaTime ){
+			if( shotGun ) {
+				StartCoroutine( ShotGunEnding() );
+				StopCoroutine( gunPhase );
+			}
+			// Debug.Log("2");
+			yield return null;
+		}
+		
+		
 		// wait for player to look behind
 		// once looking around, put gun down
 		float directionlooked = Cardboard.SDK.HeadPose.Orientation.eulerAngles.y - 270;
@@ -253,10 +264,10 @@ public class PlayerController : MonoBehaviour {
 		gtastars.gameObject.SetActive(false);
 		crosshair.gameObject.SetActive(false);
 		yield return new WaitForSeconds(2);
-		audioMixer.SetFloat("ForestVolume", 10);
+		StartCoroutine( ScaleAudio("ForestVolume", 10, 15) );
 		theatreText.gameObject.SetActive(true);
-		theatreText.text = "It's rather easy to shoot birds when you have a gun.";
-		yield return new WaitForSeconds(5);
+		theatreText.text = "It's rather easy to shoot birds when you have a gun, isn't it.";
+		yield return new WaitForSeconds(7);
 		theatreText.text = "When the same interface for progressing is the one for violence, violence becomes the progression.";
 		yield return new WaitForSeconds(10);
 		theatreText.text = "I'd rather just stay with the birds myself.";
@@ -271,11 +282,20 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 	
+	 IEnumerator ScaleAudio(string key, float value, float duration) {
+		 float start;
+		 audioMixer.GetFloat(key, out start);
+		 for( float time = 0; time < duration; time += Time.deltaTime ) {
+			audioMixer.SetFloat(key, Mathf.Lerp(start, value, time/duration ));
+			yield return null;
+		}
+	 }
+	
 	IEnumerator RollCredits() {
 		wetgrassMusic.Play();
-		audioMixer.SetFloat("ForestVolume", -80);
-		audioMixer.SetFloat("AudienceVolume", -80);
-		audioMixer.SetFloat("PigeonsVolume", -80);
+		StartCoroutine( ScaleAudio("ForestVolume", -80, 2) );
+		StartCoroutine( ScaleAudio("AudienceVolume", -80, 2) );
+		StartCoroutine( ScaleAudio("PigeonsVolume", -80, 2) );
 		titleCard.SetActive(true);
 		introText.gameObject.SetActive(false);
 		yield return new WaitForSeconds(6); // 6
